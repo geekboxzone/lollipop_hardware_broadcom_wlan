@@ -145,6 +145,19 @@ int wpa_driver_nl80211_driver_cmd(void *priv, char *cmd, char *buf,
 		priv_cmd.used_len = buf_len;
 		priv_cmd.total_len = buf_len;
 		ifr.ifr_data = &priv_cmd;
+                check_wifi_chip_type_string(wifi_chip_type);
+                if(!strcmp(wifi_chip_type, "ESP8089")){
+                 //add by xxh ESP8089 Any unsupport private command go continue
+                        drv_errors = 0;
+                        ret = 0;
+                        if ((os_strcasecmp(cmd, "LINKSPEED") == 0) ||
+                            (os_strcasecmp(cmd, "RSSI") == 0) ||
+                            (os_strcasecmp(cmd, "GETBAND") == 0) ||
+                            (os_strncasecmp(cmd, "WLS_BATCHING", 12) == 0))
+                                ret = strlen(buf);
+                        wpa_driver_notify_country_change(drv->ctx, cmd);
+                        wpa_printf(MSG_DEBUG, "%s %s len = %d, %zu", __func__, buf, ret, strlen(buf));
+                } else {               
 
 		if ((ret = ioctl(drv->global->ioctl_sock, SIOCDEVPRIVATE + 1, &ifr)) < 0) {
 			wpa_printf(MSG_ERROR, "%s: failed to issue private command: %s", __func__, cmd);
@@ -160,6 +173,7 @@ int wpa_driver_nl80211_driver_cmd(void *priv, char *cmd, char *buf,
 			wpa_driver_notify_country_change(drv->ctx, cmd);
 			wpa_printf(MSG_DEBUG, "%s %s len = %d, %zu", __func__, buf, ret, strlen(buf));
 		}
+            }
 	}
 	return ret;
 }
