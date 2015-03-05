@@ -145,7 +145,9 @@ int wpa_driver_nl80211_driver_cmd(void *priv, char *cmd, char *buf,
 		priv_cmd.used_len = buf_len;
 		priv_cmd.total_len = buf_len;
 		ifr.ifr_data = &priv_cmd;
-                check_wifi_chip_type_string(wifi_chip_type);
+
+                if(wifi_chip_type[0] == 0)
+                  check_wifi_chip_type_string(wifi_chip_type);
                 if(!strcmp(wifi_chip_type, "ESP8089")){
                  //add by xxh ESP8089 Any unsupport private command go continue
                         drv_errors = 0;
